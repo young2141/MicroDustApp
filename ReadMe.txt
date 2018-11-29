@@ -3,5 +3,5 @@ test
 Team Member
 JeongHun Shin
 Taeyoung Lee
-Hi ^^7
+JaeYoung Yang
 Changeun Ji

@@ -56,11 +56,18 @@
 		</Spinner>
 
 	</LinearLayout>
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/totalcnt2"/>
+
 	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		android:layout_weight="1"
 		android:id="@+id/totalcnt"/>
+
 
 
 	<LinearLayout
@@ -81,7 +88,7 @@
 				android:layout_height="0dp"
 				android:layout_weight="1"
 				android:text="측정시각"/>
-			<TextView
+		<!--	<TextView
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
@@ -100,13 +107,13 @@
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
-				android:text="이산화질소 농도"/>
+				android:text="이산화질소 농도"/>-->
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
 				android:text="미세먼지 농도"/>
-			<TextView
+			<!--<TextView
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
@@ -135,7 +142,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
-				android:text="이산화질소 지수"/>
+				android:text="이산화질소 지수"/>-->
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
@@ -153,7 +160,7 @@
 				android:layout_height="0dp"
 				android:layout_weight="1"
 				android:id="@+id/date"/>
-			<TextView
+			<!--<TextView
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
@@ -172,13 +179,13 @@
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
-				android:id="@+id/no2value"/>
+				android:id="@+id/no2value"/>-->
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
 				android:id="@+id/pm10value"/>
-			<TextView
+			<!--<TextView
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
@@ -207,7 +214,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="0dp"
 				android:layout_weight="1"
-				android:id="@+id/no2grade"/>
+				android:id="@+id/no2grade"/>-->
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="0dp"

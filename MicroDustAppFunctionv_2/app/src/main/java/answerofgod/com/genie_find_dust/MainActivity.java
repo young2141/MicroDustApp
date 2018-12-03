@@ -9,14 +9,19 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AbsoluteLayout;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,66 +34,92 @@ import java.security.MessageDigest;
 
 /**
  *
- * 
+ *
  *  @modify Jeonghun Shin
  *
  */
 
-public class MainActivity extends Activity implements OnClickListener,AdapterView.OnItemSelectedListener,GoogleApiClient.OnConnectionFailedListener,GoogleApiClient.ConnectionCallbacks {
+public class MainActivity extends AppCompatActivity implements OnClickListener,AdapterView.OnItemSelectedListener,GoogleApiClient.OnConnectionFailedListener,GoogleApiClient.ConnectionCallbacks {
 
 	GoogleApiClient mGoogleApiClient;
 	Location mLastLocation;
 	Button getBtn,getNearStation;
-	static EditText where;
+	static TextView where;
 	String from="WGS84";
 	String to="TM";
 	static Spinner sido,station;	//스피너
 	static String sidolist[]={"서울","부산","대전","대구","광주","울산","경기","강원","충북","충남","경북","경남","전북","전남","제주"};
 	static String stationlist[];	//측정소목록(이건 api로 가져올꺼라 몇개인지 모른다)
 	static ArrayAdapter<String> spinnerSido,spinnerStation;	//spinner에 붙일 array adapter
-	static TextView totalcnt,date,so2value,covalue,o3value,no2value,pm10value,khaivalue,so2grade,cograde,o3grade,no2grade,pm10grade,khaigrade;
+	static TextView totalcnt,totalcnt2,date,so2value,covalue,o3value,no2value,pm10value,khaivalue,so2grade,cograde,o3grade,no2grade,pm10grade,khaigrade;
 	static int stationCnt=0;
 	static Context mContext;	//static에서 context를 쓰기위해
-
+	ImageButton tempImage;
+	private ImageButton imageButton = null;
+	private RelativeLayout layout;
+	private AbsoluteLayout layout2;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//getAppKeyHash(); //다음 카카오 api사용을 위한 해쉬키 get을 위한 함수.
-		setContentView(R.layout.activity_main);
-		init();
-   }
-   /*
-	private void getAppKeyHash() {
-		try {
-			PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
-			for (Signature signature : info.signatures) {
-				MessageDigest md;
-				md = MessageDigest.getInstance("SHA");
-				md.update(signature.toByteArray());
-				String something = new String(Base64.encode(md.digest(), 0));
-				Log.d("Hash key", something);
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			Log.e("name not found", e.toString());
-		}
-	}*/
+		setContentView(R.layout.activity_dust_monitor_content);
+
+		init2();
+	}
+	/*
+     private void getAppKeyHash() {
+         try {
+             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
+             for (Signature signature : info.signatures) {
+                 MessageDigest md;
+                 md = MessageDigest.getInstance("SHA");
+                 md.update(signature.toByteArray());
+                 String something = new String(Base64.encode(md.digest(), 0));
+                 Log.d("Hash key", something);
+             }
+         } catch (Exception e) {
+             // TODO Auto-generated catch block
+             Log.e("name not found", e.toString());
+         }
+     }*/
+	public void init2(){
+		layout =   (RelativeLayout)findViewById(R.id.dustmonitor_relativelayout);
+		layout2 =  (AbsoluteLayout)findViewById(R.id.dustmonitor_abslayout);
+		imageButton = (ImageButton)findViewById(R.id.dustmonitor_vectorDust);
+		tempImage = new ImageButton(this);
+		mContext=getApplicationContext();	//static에서 context를 쓰기위해~
+		pm10value=(TextView)findViewById(R.id.dustmonitor_density);
+		pm10grade=(TextView)findViewById(R.id.dustmoniotr_textlevel);
+		where=(TextView)findViewById(R.id.dustmonitor_location);
+		imageButton.setOnClickListener(this);
+
+		mGoogleApiClient = new GoogleApiClient.Builder(this)	//google service
+				.addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(LocationServices.API)
+				.build();
+
+	}
 	public void init() {
+
+
 		mContext=getApplicationContext();	//static에서 context를 쓰기위해~
 		totalcnt=(TextView)findViewById(R.id.totalcnt);
+		totalcnt2=(TextView)findViewById(R.id.totalcnt2);
 		date=(TextView)findViewById(R.id.date);
-		so2value=(TextView)findViewById(R.id.so2value);
+		/*so2value=(TextView)findViewById(R.id.so2value);
 		covalue=(TextView)findViewById(R.id.covalue);
 		o3value=(TextView)findViewById(R.id.o3value);
-		no2value=(TextView)findViewById(R.id.no2value);
+		no2value=(TextView)findViewById(R.id.no2value);*/
 		pm10value=(TextView)findViewById(R.id.pm10value);
-		khaivalue=(TextView)findViewById(R.id.khaivalue);
+		/*khaivalue=(TextView)findViewById(R.id.khaivalue);
 		so2grade=(TextView)findViewById(R.id.so2grade);
 		cograde=(TextView)findViewById(R.id.cograde);
 		o3grade=(TextView)findViewById(R.id.o3grade);
-		no2grade=(TextView)findViewById(R.id.no2grade);
-		pm10grade=(TextView)findViewById(R.id.pm10grade);
 		khaigrade=(TextView)findViewById(R.id.khaigrade);
+		no2grade=(TextView)findViewById(R.id.no2grade);*/
+		pm10grade=(TextView)findViewById(R.id.pm10grade);
+
 
 		where=(EditText)findViewById(R.id.where);
 		getNearStation=(Button) findViewById(R.id.getNearStation);		//측정소버튼 객체생성
@@ -120,50 +151,51 @@ public class MainActivity extends Activity implements OnClickListener,AdapterVie
 		GetFindDustThread.active=true;
 		GetFindDustThread getweatherthread=new GetFindDustThread(false,name);		//스레드생성(UI 스레드사용시 system 뻗는다)
 		getweatherthread.start();	//스레드 시작
-		
+
 	}
-	
+
 	public static void  FindDustThreadResponse(String getCnt,String[] sDate,String[] sSo2Value,String[] sCoValue,String[] sO3Value,String[] sNo2Value,String[] sPm10Value,String[] sKhaiValue,String[] sKhaiGrade,String[] sSo2Grade,String[] sNo2Grade,String[] sCoGrade,String[] sO3Grade,String[] sPm10Grade){	//대기정보 가져온 결과값
 		stationCnt=0;	//측정개수정보(여기선 1개만 가져온다
 		stationCnt=Integer.parseInt(getCnt);
 
 		Log.w("stationcnt", String.valueOf(stationCnt));
 
-		 if(stationCnt==0) {	//만약 측정정보가 없다면
-			 totalcnt.setText("측정소 정보가 없거나 측정정보가 없습니다.");
-			 date.setText("");	//
-			 so2value.setText("");
+		if(stationCnt==0) {	//만약 측정정보가 없다면
+			// totalcnt.setText("측정소 정보가 없거나 측정정보가 없습니다.");
+			// date.setText("");	//
+			/* so2value.setText("");
 			 covalue.setText("");
 			 no2value.setText("");
-			 o3value.setText("");
-			 pm10value.setText("");
-			 khaivalue.setText("");
+			 o3value.setText("");*/
+			pm10value.setText("측정불가");
+			/* khaivalue.setText("");
 			 khaigrade.setText("");
 			 so2grade.setText("");
 			 no2grade.setText("");
 			 cograde.setText("");
 			 o3grade.setText("");
-			 no2grade.setText("");
-			 pm10grade.setText("");
-		 }else{	//측정정보있으면
-			 totalcnt.setText(sDate[0] + "에 대기정보가 업데이트 되었습니다.");
+			 no2grade.setText("");*/
+			pm10grade.setText("측정불가");
+		}else{	//측정정보있으면
+			// totalcnt.setText(sDate[0] + "에 대기정보가 업데이트 되었습니다.");
 
-			 date.setText(sDate[0]);	//
-			 so2value.setText(sSo2Value[0]+"ppm");
+			// date.setText(sDate[0]);	//
+			 /*so2value.setText(sSo2Value[0]+"ppm");
 			 covalue.setText(sCoValue[0]+"ppm");
 			 no2value.setText(sNo2Value[0]+"ppm");
 			 o3value.setText(sO3Value[0]+"ppm");
-			 pm10value.setText(sPm10Value[0]+"μg/m³");
-			 khaivalue.setText(sKhaiValue[0]);
+			*/
+			pm10value.setText(sPm10Value[0]+"μg/m³");
+			/* khaivalue.setText(sKhaiValue[0]);
 			 khaigrade.setText(transGrade(sKhaiGrade[0]));
 			 so2grade.setText(transGrade(sSo2Grade[0]));
 			 no2grade.setText(transGrade(sNo2Grade[0]));
 			 cograde.setText(transGrade(sCoGrade[0]));
 			 o3grade.setText(transGrade(sO3Grade[0]));
-			 no2grade.setText(transGrade(sNo2Grade[0]));
-			 pm10grade.setText(transGrade(sPm10Grade[0]));
+			 no2grade.setText(transGrade(sNo2Grade[0]));*/
+			pm10grade.setText(transGrade(sPm10Grade[0]));
 
-		 }
+		}
 
 		GetFindDustThread.active=false;
 		GetFindDustThread.interrupted();
@@ -186,8 +218,8 @@ public class MainActivity extends Activity implements OnClickListener,AdapterVie
 		}
 		//stationlist=sStation;
 		//if(stationCnt!=0){
-			spinnerStation=new ArrayAdapter<>(mContext,R.layout.spinner_text,stationlist);
-			station.setAdapter(spinnerStation);
+		spinnerStation=new ArrayAdapter<>(mContext,R.layout.spinner_text,stationlist);
+		station.setAdapter(spinnerStation);
 		//}
 
 
@@ -205,9 +237,19 @@ public class MainActivity extends Activity implements OnClickListener,AdapterVie
 		getstationthread.start();	//스레드 시작
 
 	}
+
+	public static void imageButton(String yGrid,String xGrid){	//이건 측정소 정보가져올 스레드
+
+
+		GetStationListThread.active=true;
+		GetStationListThread getstationthread=new GetStationListThread(false,yGrid,xGrid);		//스레드생성(UI 스레드사용시 system 뻗는다)
+		getstationthread.start();	//스레드 시작
+
+	}
 	public static void  NearStationThreadResponse(String[] sStation,String[] sAddr,String[] sTm){	//측정소 정보를 가져온 결과
 		where.setText(sStation[0]);
-		totalcnt.setText("가까운 측정소 :" + sStation[0] + "\r\n측정소 주소 :" +sAddr[0]+"\r\n측정소까지 거리 :"+sTm[0]+"km");
+		//	totalcnt2.setText("가까운 측정소 :" + sStation[0] + "\r\n측정소 주소 :" +sAddr[0]+"\r\n측정소까지 거리 :"+sTm[0]+"km");
+
 		GetFindDustThread.active=false;
 		GetFindDustThread.interrupted();
 	}
@@ -268,24 +310,38 @@ public class MainActivity extends Activity implements OnClickListener,AdapterVie
 	/**
 	 * 버튼에 대한 처리
 	 */
-
+/*
 	public void onClick(View v) {
-		
+
 		switch(v.getId()){
 
 		case R.id.getBtn:	//대기정보 가져오는 버튼
-			String stationName;
-			stationName=where.getText().toString();
-			getFindDust(stationName);
+
 
 			break;
 		case R.id.getNearStation:
 			mGoogleApiClient.connect();
+			String stationName;
+			stationName=where.getText().toString();
+			getFindDust(stationName);
 			break;
 		default:
 			break;
 		}
+	}*/
+	public void onClick(View v){
+		switch(v.getId()){
+			case R.id.dustmonitor_vectorDust:
+				mGoogleApiClient.connect();
+				String stationName;
+				stationName=where.getText().toString();
+				getFindDust(stationName);
+				break;
+			default:
+				break;
+		}
 	}
+
 
 
 	@Override
@@ -326,10 +382,9 @@ public class MainActivity extends Activity implements OnClickListener,AdapterVie
 
 	@Override
 	public void onConnected(Bundle bundle) {
-		//String x="128.6096169";
-		//String y="35.8900695";
+
 		mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-		Log.d("mLastLocation",String.valueOf(mLastLocation.getLatitude()) + "," + mLastLocation.getLongitude());
+//		Log.d("mLastLocation",String.valueOf(mLastLocation.getLatitude()) + "," + mLastLocation.getLongitude());
 		if (mLastLocation != null) {
 
 			//totalcnt.setText(String.valueOf(mLastLocation.getLatitude()) + "," + mLastLocation.getLongitude());
@@ -337,7 +392,7 @@ public class MainActivity extends Activity implements OnClickListener,AdapterVie
 			//getStation(y,x);
 			//35.8900695,128.6096169
 		}else{
-			totalcnt.setText("위치를 알 수 없습니다.");
+			where.setText("위치를 알 수 없습니다.");
 		}
 		mGoogleApiClient.disconnect();
 

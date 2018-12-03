@@ -168,9 +168,9 @@ class GetStationListThread extends Thread {	//기상청 연결을 위한 스레�
 					tResponse=false;
 					Log.e("station cnt",""+sTotalCount);
 					data=0;		//
-					if(getAPI==1)
-						MainActivity.StationListThreadResponse(sTotalCount, sStationName);
-					else if(getAPI==2)
+					/*if(getAPI==1)
+						MainActivity.StationListThreadResponse(sTotalCount, sStationName);*/
+					 if(getAPI==2)
 						MainActivity.NearStationThreadResponse(sStationName,sAddr,sTm);
 
 

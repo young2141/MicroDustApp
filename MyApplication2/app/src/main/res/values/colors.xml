@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="good">#1489cc</color>
+    <color name="goodunder">#11a9f5</color>
+    <color name="soso">#03818f</color>
+    <color name="sosounder">#04adbd</color>
+    <color name="bad">#ff7512</color>
+    <color name="badunder">#ff9b0f</color>
+    <color name="verybad">#e64727</color>
+    <color name="verybadunder">#ff6130</color>
+
+</resources>

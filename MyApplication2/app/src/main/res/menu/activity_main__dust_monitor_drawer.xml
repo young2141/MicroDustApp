@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/personal_statics"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="개인 통계" />
+        <item
+            android:id="@+id/server_statics"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="전체 통계" />
+        <item
+            android:id="@+id/dust_map"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="더스트 맵" />
+        <item
+            android:id="@+id/peronal_log"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="로그 기록" />
+
+    </group>
+
+    <item android:title="Custom">
+        <menu>
+            <item
+                android:id="@+id/setting"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="설정" />
+        </menu>
+    </item>
+
+</menu>

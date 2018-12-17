@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,6 +20,8 @@ import android.widget.AbsoluteLayout;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,8 +31,14 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
+
+import static android.R.attr.data;
+import static android.R.attr.text;
+
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener,GoogleApiClient.OnConnectionFailedListener,GoogleApiClient.ConnectionCallbacks {
+
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Button getBtn,getNearStation;
@@ -40,13 +49,17 @@ public class MainActivity extends AppCompatActivity
     static String sidolist[]={"서울","부산","대전","대구","광주","울산","경기","강원","충북","충남","경북","경남","전북","전남","제주"};
     static String stationlist[];	//측정소목록(이건 api로 가져올꺼라 몇개인지 모른다)
     static ArrayAdapter<String> spinnerSido,spinnerStation;	//spinner에 붙일 array adapter
-    static TextView totalcnt,totalcnt2,date,so2value,covalue,o3value,no2value,pm10value,khaivalue,so2grade,cograde,o3grade,no2grade,pm10grade,khaigrade;
+    static TextView textView_shortWeather,totalcnt,totalcnt2,date,so2value,covalue,o3value,no2value,pm10value,khaivalue,so2grade,cograde,o3grade,no2grade,pm10grade,khaigrade;
     static int stationCnt=0;
     static Context mContext;	//static에서 context를 쓰기위해
     ImageButton tempImage;
     public static ImageButton imageButton = null;
     public static RelativeLayout layout;
     public static AbsoluteLayout layout2;
+    static boolean flag =true;
+
+    static ArrayList<ImageView> imageViews;
+    public static ImageView im0= null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +81,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void init2(){
+
+        im0=(ImageView) findViewById(R.id.imageView0);
+        textView_shortWeather = (TextView)findViewById(R.id.dustmonitor_weather);
         layout =   (RelativeLayout)findViewById(R.id.dustmonitor_relativelayout);
         layout2 =  (AbsoluteLayout)findViewById(R.id.dustmonitor_abslayout);
         imageButton = (ImageButton)findViewById(R.id.dustmonitor_vectorDust);
@@ -77,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         pm10grade=(TextView)findViewById(R.id.dustmoniotr_textlevel);
         where=(TextView)findViewById(R.id.dustmonitor_location);
         imageButton.setOnClickListener(this);
+
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)	//google service
                 .addConnectionCallbacks(this)
@@ -235,13 +252,51 @@ public class MainActivity extends AppCompatActivity
     }
     public static void  NearStationThreadResponse(String[] sStation,String[] sAddr,String[] sTm){	//측정소 정보를 가져온 결과
         where.setText(sStation[0]);
-     
+
         GetFindDustThread.active=false;
         GetFindDustThread.interrupted();
     }
+
+
+    public static void getWeatherThread(String xGrid,String yGrid){	//이건 측정소 정보가져올 스레드
+
+        GetWetherThread.active=true;
+        GetWetherThread getwetherthread=new GetWetherThread(xGrid,yGrid);		//스레드생성(UI 스레드사용시 system 뻗는다)
+        getwetherthread.start();	//스레드 시작
+
+
+    }
+    public static void WeatherThreadResponse( ArrayList<ShortWeather> shortWeathers){
+
+        String data = "         ";
+
+        for(int i=0; i<shortWeathers.size(); i++) {
+
+                    data += shortWeathers.get(i).getHour() + "               ";
+
+            if(shortWeathers.get(0).getWfKor().equals("구름조금")){
+                im0.setImageResource(R.drawable.sunny);
+            }
+        }
+
+        Log.w("---------야임마**** ", data);
+        textView_shortWeather.setText(data);
+
+        GetWetherThread.interrupted();
+
+    }
+
+
+
+
+
     void getStation(String yGrid,String xGrid){
         double dx,dy;
         if(xGrid!=null&&yGrid!=null){
+            if (flag == true) {
+                getWeatherThread(xGrid,yGrid);
+                flag = false;
+            }
             dx=Double.parseDouble(xGrid);
             dy=Double.parseDouble(yGrid);
 
@@ -259,7 +314,7 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View v){
         switch(v.getId()){
             case R.id.dustmonitor_vectorDust:
-            //    pm10value.setText("측정불가");
+                //    pm10value.setText("측정불가");
                 mGoogleApiClient.connect();
                 String stationName;
                 stationName=where.getText().toString();

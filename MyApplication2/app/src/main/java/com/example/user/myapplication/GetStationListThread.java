@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 
 /**
  * 대기정보를 가져오는 스레드
- * 
+ *
  *  @modify Jeonghun Shin
  *
  */
@@ -49,11 +49,11 @@ class GetStationListThread extends Thread {	//기상청 연결을 위한 스레�
 		Log.w("스레드가 시이름", sido);
 		handler=new Handler();
 		isreceiver=receiver;
-		 try{
-			 addr+= URLEncoder.encode(sido, "utf-8");
-		 }catch(Exception e){
+		try{
+			addr+= URLEncoder.encode(sido, "utf-8");
+		}catch(Exception e){
 
-		 }
+		}
 
 		getAPI=1;	//사용할 API 구분용
 		stationUrl=getInfo+getStationFindDust+addr+"&"+infoCnt+"&"+Servicekey;
@@ -71,7 +71,7 @@ class GetStationListThread extends Thread {	//기상청 연결을 위한 스레�
 
 	}
 	public void run(){
-		
+
 		if(active){
 			try{
 				bStationName=bAddr=bTm=false;
@@ -98,12 +98,12 @@ class GetStationListThread extends Thread {	//기상청 연결을 위한 스레�
 							if(xpp.getName().equals("stationName")){	//측정소
 								bStationName=true;
 							}if(xpp.getName().equals("addr")){	//주소
-								bAddr=true;
-							}if(xpp.getName().equals("tm")){	//거리
-								bTm=true;
-							}if(xpp.getName().equals("totalCount")){	//측정소 수
-								bTotalCount=true;
-							}
+							bAddr=true;
+						}if(xpp.getName().equals("tm")){	//거리
+							bTm=true;
+						}if(xpp.getName().equals("totalCount")){	//측정소 수
+							bTotalCount=true;
+						}
 
 							break;
 
@@ -114,15 +114,15 @@ class GetStationListThread extends Thread {	//기상청 연결을 위한 스레�
 								sStationName[data]=xpp.getText();
 								bStationName=false;
 							}if(bAddr){
-								sAddr[data]=xpp.getText();
-								bAddr=false;
-							}if(bTm){
-								sTm[data]=xpp.getText();
-								bTm=false;
-							}if(bTotalCount){
-								sTotalCount=xpp.getText();
-								bTotalCount=false;
-							}
+							sAddr[data]=xpp.getText();
+							bAddr=false;
+						}if(bTm){
+							sTm[data]=xpp.getText();
+							bTm=false;
+						}if(bTotalCount){
+							sTotalCount=xpp.getText();
+							bTotalCount=false;
+						}
 							break;
 
 						case XmlPullParser.END_TAG:		//'</' 엔드태그를 만나면 (이부분이 중요)
@@ -131,38 +131,38 @@ class GetStationListThread extends Thread {	//기상청 연결을 위한 스레�
 								tResponse=true;						//따라서 이때 모든 정보를 화면에 뿌려주면 된다.
 								view_text();					//뿌려주는 곳~
 							}if(xpp.getName().equals("dmY")){	//측정소 리스트의 경우 item태그가 2개이므로
-								data++;							//dmY로 구분
-							}if(xpp.getName().equals("tm")){	//가까운 측정소 구분은 tm으로 구분
+							data++;							//dmY로 구분
+						}if(xpp.getName().equals("tm")){	//가까운 측정소 구분은 tm으로 구분
 							data++;
-							}
+						}
 							break;
 					}
 					eventType=xpp.next();	//이건 다음 이벤트로~
 				}
 
 
-				
+
 			}catch(Exception e){
 				e.printStackTrace();
 			}
 		}
-		
-		
-		
+
+
+
 	}
-	
+
 	/**
-	 * 이 부분이 뿌려주는곳 
+	 * 이 부분이 뿌려주는곳
 	 * 뿌리는건 핸들러가~
 	 * @author Ans
 	 */
 	private void view_text(){
-		
+
 		handler.post(new Runnable() {	//기본 핸들러니깐 handler.post하면됨
-			
+
 			@Override
 			public void run() {
-				
+
 				active=false;
 				if(tResponse){		//문서를 다 읽었다
 					tResponse=false;
@@ -171,13 +171,13 @@ class GetStationListThread extends Thread {	//기상청 연결을 위한 스레�
 					/*
 					if(getAPI==1)
 						com.example.user.myapplication.MainActivity.StationListThreadResponse(sTotalCount, sStationName);*/
-					 if(getAPI==2)
-					    com.example.user.myapplication.MainActivity.NearStationThreadResponse(sStationName,sAddr,sTm);
+					if(getAPI==2)
+						com.example.user.myapplication.MainActivity.NearStationThreadResponse(sStationName,sAddr,sTm);
 
 
 				}
-				
-				
+
+
 			}
 		});
 	}
